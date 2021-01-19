@@ -2,30 +2,32 @@ package main
 
 import (
 	"errors"
+	"fmt"
 )
 
-type Item struct {
+type item struct {
 	Name     string `json:"name"`
 	Quantity int    `json:"quantity"`
 	Price    int    `json:"price"`
 }
 
-type Email struct {
+type email struct {
 	EmailName string `json:"email"`
 }
 
-type ItemRepositoryInterface interface {
-	GetAllItems([]Item, []Email) (map[string]int, error)
-	GetAllItemsPeriodicSequence([]Item, []Email) (map[string]int, error)
+type itemRepositoryInterface interface {
+	GetAllItems([]item, []email) (map[string]int, error)
+	GetAllItemsPeriodicSequence([]item, []email) (map[string]int, error)
 }
 
-type ItemService struct {
-	ItemRepositoryInterface
+type itemService struct {
+	itemRepositoryInterface
 }
 
-type ItemRepository struct{}
+type itemRepository struct{}
 
-func (r ItemRepository) GetAllItems(items []Item, emails []Email) (map[string]int, error) {
+// GetAllItems -> Return a map with email as key and the price as value
+func (r itemRepository) GetAllItems(items []item, emails []email) (map[string]int, error) {
 	finalResult, err := calculateFinal(items, emails)
 	if err != nil {
 		return nil, err
@@ -33,7 +35,8 @@ func (r ItemRepository) GetAllItems(items []Item, emails []Email) (map[string]in
 	return finalResult, nil
 }
 
-func (r ItemRepository) GetAllItemsPeriodicSequence(items []Item, emails []Email) (map[string]int, error) {
+// GetAllItemsPeriodicSequence -> Return a map with email as key and the price as value that are a periodic sequence
+func (r itemRepository) GetAllItemsPeriodicSequence(items []item, emails []email) (map[string]int, error) {
 	finalResult, err := calculateFinalInfiniteTitheCase(items, emails)
 	if err != nil {
 		return nil, err
@@ -41,42 +44,45 @@ func (r ItemRepository) GetAllItemsPeriodicSequence(items []Item, emails []Email
 	return finalResult, nil
 }
 
-func mockData() ([]Item, []Email) {
-	email := []Email{
+func mockData() ([]item, []email) {
+	email := []email{
 		{"testing@hotmail.com"},
 		{"testingTwo@gmail.com"},
 	}
 	// using cents too help in the manipulation
-	users := []Item{
+	item := []item{
 		{"uva", 1, 50},
 		{"pessego", 1, 50},
 	}
-	return users, email
+	return item, email
 }
 
-func mockDataToInfiniteTitheCase() ([]Item, []Email) {
-	email := []Email{
+func mockDataToInfiniteTitheCase() ([]item, []email) {
+	email := []email{
 		{"testing@hotmail.com"},
 		{"testingTwo@gmail.com"},
 		{"testingThird@gmail.com"},
+		{"testingFouth@gmail.com"},
+		{"testingFifth@gmail.com"},
+		{"testingSixty@gmail.com"},
 	}
 	// using cents too help in the manipulation
-	users := []Item{
+	item := []item{
 		{"uva", 1, 150},
 		{"pessego", 1, 50},
 	}
-	return users, email
+	return item, email
 }
 
-func calculateItemsSum(items []Item) (int, error) {
+func calculateItemsSum(items []item) int {
 	var acc int
 	for _, s := range items {
 		acc += s.Price * s.Quantity
 	}
-	return acc, nil
+	return acc
 }
 
-func dividePriceByEmails(price int, emails []Email) ([]int, error) {
+func dividePriceByEmails(price int, emails []email) []int {
 	var resp []int
 	var value int
 	var ok bool
@@ -92,63 +98,59 @@ func dividePriceByEmails(price int, emails []Email) ([]int, error) {
 	if ok {
 		resp[emailsLen-1] = (price / emailsLen) + 1
 	}
-	return resp, nil
+	return resp
 }
 
-func finalCalculation(value []int, emails []Email) (map[string]int, error) {
-	s := make(map[string]int)
+func finalCalculation(value []int, emails []email) map[string]int {
+	s := make(map[string]int, len(emails))
 	for i, emails := range emails {
 		s[emails.EmailName] = value[i]
 	}
-	return s, nil
+	return s
 }
 
-func calculateFinal(items []Item, emails []Email) (map[string]int, error) {
-	// TODO: implement err return on all function calls below to be catched on iferr
+func calculateFinal(items []item, emails []email) (map[string]int, error) {
 	if (len(items) | len(emails)) == 0 {
 		return nil, errors.New("cannot work on empty item or email list")
 	}
-	itemsSummed, err := calculateItemsSum(items)
-	if err != nil {
-		return nil, err
-	}
-	finalValue, err := dividePriceByEmails(itemsSummed, emails)
-	if err != nil {
-		return nil, err
-	}
-	finalResult, err := finalCalculation(finalValue, emails)
-	if err != nil {
-		return nil, err
-	}
+
+	itemsSummed := calculateItemsSum(items)
+	finalValue := dividePriceByEmails(itemsSummed, emails)
+	finalResult := finalCalculation(finalValue, emails)
+
 	return finalResult, nil
 }
 
-func calculateFinalInfiniteTitheCase(items []Item, emails []Email) (map[string]int, error) {
+func calculateFinalInfiniteTitheCase(items []item, emails []email) (map[string]int, error) {
 	if (len(items) | len(emails)) == 0 {
 		return nil, errors.New("cannot work on empty item or email list")
 	}
-	itemsSummed, err := calculateItemsSum(items)
-	if err != nil {
-		return nil, err
-	}
-	finalValue, err := dividePriceByEmails(itemsSummed, emails)
-	if err != nil {
-		return nil, err
-	}
-	finalResult, err := finalCalculation(finalValue, emails)
-	if err != nil {
-		return nil, err
-	}
+
+	itemsSummed := calculateItemsSum(items)
+	finalValue := dividePriceByEmails(itemsSummed, emails)
+	finalResult := finalCalculation(finalValue, emails)
+
 	return finalResult, nil
 }
 
 func main() {
-	// TODO: Create todo on how to test the program by here
-	// itemsInfinite, emailsInfinite := mockDataToInfiniteTitheCase()
-	// items, emails := mockData()
-	// repository := ItemRepository{}
-	// service := ItemService{repository}
-	// itemsNonInfinite, err := service.GetAllItems([]Item{}, []Email{})
-	// itemsInfinite, _ := service.GetAllItemsPeriodicSequence(itemsInfinite, emailsInfinite)
-	// fmt.Println(itemsNonInfinite)
+	itemsInfinite, emailsInfinite := mockDataToInfiniteTitheCase()
+	items, emails := mockData()
+
+	repository := itemRepository{}
+	service := itemService{repository}
+
+	emptyList, err := service.GetAllItems([]item{}, []email{}) // -> Empty List
+	if err != nil {
+		fmt.Printf("Empty List - err: %v\n", err.Error())
+	}
+	itemsPeriodic, err := service.GetAllItemsPeriodicSequence(itemsInfinite, emailsInfinite) //-> Infinite sequence
+	if err != nil {
+		fmt.Printf("itemsPeriodic - err: %v\n", err.Error())
+	}
+	itemNotPeriodic, err := service.GetAllItems(items, emails) // -> Not periodic sequence
+	if err != nil {
+		fmt.Printf("itemNotPeriodic - err: %v\n", err.Error())
+	}
+	fmt.Printf("Empty list: %v\nPeriodic sequence: %v\nNot Periodic sequence: %v\n", emptyList, itemsPeriodic, itemNotPeriodic)
 }
