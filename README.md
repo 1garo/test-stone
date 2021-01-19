@@ -43,17 +43,10 @@ items := []item{
     {"laranja", 1, 50},
     {"mexirica", 1, 50},
 }
-
 repository := itemRepository{}
 service := itemService{repository}
 
 // In the end but not least, you will need to call the function that does all the calculation
-itemsInfinite, emailsInfinite := mockDataToInfiniteTitheCase()
-items, emails := mockData()
-
-repository := itemRepository{}
-service := itemService{repository}
-
 emptyList, err := service.GetAllItems([]item{}, []email{}) // -> Empty List
 if err != nil {
     fmt.Printf("Empty List - err: %v\n", err.Error())
