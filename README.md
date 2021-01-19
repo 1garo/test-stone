@@ -10,7 +10,8 @@
 2. For *b* option, you will need to follow the tips below: 
 
 ```go
-// Everything that you are gonna see below are on the main function, you can just uncomment and run it
+// Everything that you are gonna see below are on the main function,
+// you can just uncomment and run it
 
 // Error Handling
  if err != nil {
@@ -38,7 +39,8 @@ emails := []email{
     {"testingTwo@something.com"},
 }
 
-// Price field (third one) is using cents too help in the manipulation -> 100 are equivalent to R$ 1,00
+// Price field (third one) is using cents too help in the manipulation 
+// -> 100 are equivalent to R$ 1,00
 items := []item{
     {"laranja", 1, 50},
     {"mexirica", 1, 50},
@@ -51,15 +53,23 @@ emptyList, err := service.GetAllItems([]item{}, []email{}) // -> Empty List
 if err != nil {
     fmt.Printf("Empty List - err: %v\n", err.Error())
 }
-itemsPeriodic, err := service.GetAllItemsPeriodicSequence(itemsInfinite, emailsInfinite) //-> Infinite sequence
+itemsPeriodic, err := service.GetAllItemsPeriodicSequence(
+    itemsInfinite,
+    emailsInfinite) //-> Infinite sequence
 if err != nil {
     fmt.Printf("itemsPeriodic - err: %v\n", err.Error())
 }
-itemNotPeriodic, err := service.GetAllItems(items, emails) // -> Not periodic sequence
+itemNotPeriodic, err := service.GetAllItems(
+    items,
+    emails) // -> Not periodic sequence
 if err != nil {
     fmt.Printf("itemNotPeriodic - err: %v\n", err.Error())
 }
-fmt.Printf("Empty list: %v\nPeriodic sequence: %v\nNot Periodic sequence: %v\n", emptyList, itemsPeriodic, itemNotPeriodic)
+fmt.Printf(
+ "Empty list: %v\nPeriodic sequence: %v\nNot Periodic sequence: %v\n",
+ emptyList, 
+ itemsPeriodic, 
+ itemNotPeriodic)
 ```
 
 ## License
