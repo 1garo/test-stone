@@ -12,13 +12,13 @@ type ItemRepositoryMock struct {
 	mock.Mock
 }
 
-func (r *ItemRepositoryMock) GetAllItems(items []Item, emails []Email) (map[string]int, error) {
+func (r *ItemRepositoryMock) GetAllItems(items []item, emails []email) (map[string]int, error) {
 	_ = r.Called()
 	ret, err := calculateFinal(items, emails)
 	return ret, err
 }
 
-func (r *ItemRepositoryMock) GetAllItemsPeriodicSequence(items []Item, emails []Email) (map[string]int, error) {
+func (r *ItemRepositoryMock) GetAllItemsPeriodicSequence(items []item, emails []email) (map[string]int, error) {
 	_ = r.Called()
 	ret, err := calculateFinalInfiniteTitheCase(items, emails)
 	return ret, err
@@ -28,7 +28,7 @@ func TestService_GetItemsCorrect(t *testing.T) {
 	repository := ItemRepositoryMock{}
 	repository.On("GetAllItems").Return([]int{}, nil)
 
-	service := ItemService{&repository}
+	service := itemService{&repository}
 	items, emails := mockData()
 	respItems, _ := service.GetAllItems(items, emails)
 	for email := range respItems {
@@ -41,7 +41,7 @@ func TestService_GetItemsPeriodicSequence(t *testing.T) {
 	repository := ItemRepositoryMock{}
 	repository.On("GetAllItemsPeriodicSequence").Return([]int{}, nil)
 
-	service := ItemService{&repository}
+	service := itemService{&repository}
 	items, emails := mockDataToInfiniteTitheCase()
 	respItemsInfinite, _ := service.GetAllItemsPeriodicSequence(items, emails)
 	for email := range respItemsInfinite {
@@ -50,12 +50,12 @@ func TestService_GetItemsPeriodicSequence(t *testing.T) {
 	}
 }
 
-func TestService_GetItemsEmpty(t *testing.T) {
+func TestService_GetEmptyItems(t *testing.T) {
 	repository := ItemRepositoryMock{}
 	repository.On("GetAllItemsPeriodicSequence").Return([]int{}, nil)
 
-	service := ItemService{&repository}
-	_, err := service.GetAllItemsPeriodicSequence([]Item{}, []Email{})
+	service := itemService{&repository}
+	_, err := service.GetAllItemsPeriodicSequence([]item{}, []email{})
 	if err != nil {
 		assert.Equal(t, err.Error(), "cannot work on empty item or email list")
 	}
